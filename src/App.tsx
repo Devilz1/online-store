@@ -1,26 +1,34 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {MainComponent} from "./containers/Main";
+import BasketComponent from "./containers/Basket";
+import {useRoutes} from "hookrouter";
+import {Header} from "./containers/Header";
+import styled from 'styled-components';
+import {NotPageFound} from "./containers/NotPageFound";
+
+const routes = {
+  "/": () => <MainComponent />,
+  "/basket": () => <BasketComponent />,
+};
 
 function App() {
+  const routeResult = useRoutes(routes);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppWrapper>
+      <Header routeResult={routeResult}/>
+
+      {routeResult || <NotPageFound />}
+    </AppWrapper>
   );
 }
 
 export default App;
+
+const AppWrapper: any = styled.div`
+    width: 100%;
+    max-width: 1280px;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+`;
