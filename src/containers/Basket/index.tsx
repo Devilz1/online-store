@@ -1,9 +1,10 @@
 import React, {useEffect} from 'react';
 import styled from "styled-components";
 import {connect, useDispatch, useSelector} from "react-redux";
-import {getBasket, saveBasket} from "../../actions/MainAction";
+import {getBasket, removeItem, saveBasket} from "../../actions/MainAction";
 import {AddElement} from "../../components/Basket";
 import {Books} from "../../types/Basket/action";
+
 import book_image from './../../images/book_image.png';
 import minus from './../../images/minus.svg';
 import plus from './../../images/plus.svg';
@@ -45,6 +46,8 @@ const BasketComponent = () => {
         dispatch(saveBasket(booksItems));
     };
 
+    console.log('books: ', books);
+
     return (
         <BasketWrapper>
             <BookList>
@@ -53,7 +56,7 @@ const BasketComponent = () => {
                         <BookItem key={key}>
                             <ItemImage>
                                 <Image src={book_image}/>
-                                <Delete>
+                                <Delete onClick={() => {dispatch(removeItem(book.id))}}>
                                     <IconDelete src={basket}/>
                                 </Delete>
                             </ItemImage>
@@ -106,6 +109,7 @@ const BookList = styled.div`
     &:after{
         content: "";
         width: calc(100% / 4 - 2rem);
+        min-height: 350px;
     }
     
     &:before{
@@ -202,6 +206,8 @@ export const ItemPrice = styled.span`
     font-size: 20px;
     font-weight: 400;
     text-align: center;
+    display: flex;
+    justify-content: space-around;
 `;
 
 export const ItemControlPanel = styled.div`

@@ -2,21 +2,12 @@ import React, {useEffect, useState} from 'react';
 import styled from "styled-components";
 
 import book_image from "../../images/book_image.png";
-import minus from "../../images/minus.svg";
-import plus from "../../images/plus.svg";
 import book from "../../images/book.png";
 
 import {
     ItemImage,
-    ItemTitle,
-    ItemPrice,
-    ItemControlPanel,
-    ImageIcon,
-    Minus,
-    Plus
 } from "../../containers/Basket";
 import {Books} from "../../types/Basket/action";
-import {saveBasket} from "../../actions/MainAction";
 
 type Props = {
     books: Array<Books>,
@@ -61,20 +52,6 @@ export const AddElement = (props: Props) => {
         });
     };
 
-    const minusCountBook = () => {
-        changeFormData({
-            ...formData,
-            amount: +formData.amount - 1
-        });
-    };
-
-    const plusCountBook = () => {
-        changeFormData({
-            ...formData,
-            amount: +formData.amount + 1
-        });
-    };
-
     const addBook = () => {
         let bookItems = props.books;
         formData.id = bookItems[bookItems.length - 1].id + 1;
@@ -109,51 +86,52 @@ export const AddElement = (props: Props) => {
                     <SaveButton
                         validate={validate}
                         onClick={()=>{addBook()}}
-                    >Ок</SaveButton>
+                    >Сохранить</SaveButton>
                 ) : (
                     <SaveButton
                         validate={validate}
-                        title="Заполните все поля корректно"
-                    >Error</SaveButton>
+                    >Заполните все поля корректно</SaveButton>
                 )}
-
                 <ItemImage>
                     <Image src={book_image}/>
                 </ItemImage>
-                <ItemTitle>
+                <AddColsInput>
+                    <AddLabel>
+                        Название:
+                    </AddLabel>
                     <AddInput
                         type="text"
                         name="name"
                         value={formData.name}
-                        placeholder="Название"
                         onChange={(e)=>{editFormData(e.target)}}
                         onKeyPress={(e) => {handleKeyPressCode(e)}}
                     />
-                </ItemTitle>
-                <ItemPrice>
+                </AddColsInput>
+                <AddColsInput>
+                    <AddLabel>
+                        Стоимость:
+                    </AddLabel>
                     <AddInput
                         type="number"
+                        step="50"
                         name="price"
                         value={formData.price}
                         onChange={(e)=>{editFormData(e.target)}}
                         onKeyPress={(e) => {handleKeyPressCode(e)}}
                     />
-                </ItemPrice>
-                <ItemControlPanel>
-                    <Minus onClick={()=>{minusCountBook()}}>
-                        <ImageIcon src={minus}/>
-                    </Minus>
-                    <Count
+                </AddColsInput>
+                <AddColsInput>
+                    <AddLabel>
+                        Колличество:
+                    </AddLabel>
+                    <AddInput
                         type="number"
                         name="amount"
                         value={formData.amount}
                         onChange={(e)=>{editFormData(e.target)}}
                         onKeyPress={(e) => {handleKeyPressCode(e)}}
                     />
-                    <Plus onClick={()=>{plusCountBook()}}>
-                        <ImageIcon src={plus}/>
-                    </Plus>
-                </ItemControlPanel>
+                </AddColsInput>
             </BookItem>
         </AddBookWrapper>
     );
@@ -182,12 +160,14 @@ const BookItem = styled.form<any>`
 `;
 
 const SaveButton = styled.div<any>`
-    width: 75px;
+    width: 90%;
     height: 75px;
-    border-radius: 50%;
+    border-radius: 4px;
     transition: .3s linear;
     position: absolute;
-    top: 1rem;
+    top: 0;
+    bottom: 0;
+    margin: auto;
     right: 1rem;
     background: ${({validate}) => validate ? "#22ab00" : "#ca1e0e"};
     cursor: ${({validate}) => validate ? "pointer" : "not-allowed"};
@@ -198,6 +178,7 @@ const SaveButton = styled.div<any>`
     font-family: "Rubik";
     color: #fff;
     z-index: 1;
+    text-align: center;
 `;
 
 const AddBook = styled(BookItem)`
@@ -245,20 +226,18 @@ const AddInput = styled.input`
     padding: 4px 0;
     font-size: 18px;
     text-align: center;
+    margin-left: 12px;
+    width: 100%;
 `;
 
-export const Count = styled.input`
-    width: 2rem;
-    padding: 4px 10px;
-    border-top: 1px solid rgba(0,0,0,.3);
-    border-bottom: 1px solid rgba(0,0,0,.3);
-    border-left: none;
-    border-right: none;
-    outline: none;
-    font-size: 18px;
-    font-family: "Rubik";
-    font-weight: 400;
+const AddColsInput = styled.div`
+    width: 100%;
     display: flex;
-    justify-content: center;
     align-items: center;
+    margin-top: 1.5rem;
+`;
+
+const AddLabel = styled.label`
+    min-width: 5rem;
+    font-size: 16px;
 `;
