@@ -1,16 +1,18 @@
 import React, {useEffect} from 'react';
 import styled from "styled-components";
-import {connect, useDispatch, useSelector} from "react-redux";
-import {getBasket, removeItem, saveBasket} from "../../actions/MainAction";
-import {AddElement} from "../../components/Basket";
+
+import {useDispatch, useSelector} from "react-redux";
+import {getBasket, plusMinusItem} from "../../actions/BasketAction";
+import {AddElement} from "../../components/Basket/AddElement";
+import {RemoveItem, Delete} from "../../components/Modal/RemoveItem";
 import {Books} from "../../types/Basket/action";
 
 import book_image from './../../images/book_image.png';
+import book_image_circuit from './../../images/book_image_circuit.png';
 import minus from './../../images/minus.svg';
 import plus from './../../images/plus.svg';
-import basket from './../../images/basket.png';
 
-const BasketComponent = () => {
+export const BasketComponent = () => {
     const dispatch = useDispatch();
     const { books } = useSelector((state: any) => ({
         books: state.basket.books,
@@ -20,34 +22,6 @@ const BasketComponent = () => {
         dispatch(getBasket());
     }, []);
 
-    const plusItem = (id: number) => {
-        let booksItems = books;
-
-        booksItems.map((item: Books) => {
-            if (id === item.id) {
-                item.amount++;
-            }
-        });
-
-        dispatch(saveBasket(booksItems));
-    };
-
-    const minusItem = (id: number) => {
-        let booksItems = books;
-
-        booksItems.map((item: Books) => {
-            if (item.amount >= 1) {
-                if (id === item.id) {
-                    item.amount--;
-                }
-            }
-        });
-
-        dispatch(saveBasket(booksItems));
-    };
-
-    console.log('books: ', books);
-
     return (
         <BasketWrapper>
             <BookList>
@@ -55,10 +29,11 @@ const BasketComponent = () => {
                     book.amount !== 0 && (
                         <BookItem key={key}>
                             <ItemImage>
-                                <Image src={book_image}/>
-                                <Delete onClick={() => {dispatch(removeItem(book.id))}}>
-                                    <IconDelete src={basket}/>
-                                </Delete>
+                                <Image src={book_image ? book_image : book_image_circuit}/>
+                                <RemoveItem
+                                    bookId={book.id}
+                                    delete="all"
+                                />
                             </ItemImage>
                             <ItemTitle>
                                 {book.name}
@@ -67,35 +42,29 @@ const BasketComponent = () => {
                                 {book.price} р.
                             </ItemPrice>
                             <ItemControlPanel>
-                                <Minus onClick={()=>{minusItem(book.id)}}>
-                                    <ImageIcon src={minus}/>
-                                </Minus>
+                                {book.amount === 1 ? (
+                                    <RemoveItem
+                                        bookId={book.id}
+                                        delete="iteration"
+                                    />
+                                ) : (
+                                    <Minus onClick={()=>{dispatch(plusMinusItem(book.id, "-"))}}>
+                                        <ImageIcon src={minus}/>
+                                    </Minus>
+                                )}
                                 <Count>{book.amount}</Count>
-                                <Plus onClick={()=>{plusItem(book.id)}}>
+                                <Plus onClick={()=>{dispatch(plusMinusItem(book.id, "+"))}}>
                                     <ImageIcon src={plus}/>
                                 </Plus>
                             </ItemControlPanel>
                         </BookItem>
                     )
                 )}
-                <AddElement
-                    books={books}
-                    saveBasket={saveBasket}
-                    dispatch={dispatch}
-                />
+                <AddElement />
             </BookList>
         </BasketWrapper>
     );
 };
-
-const mapStateToProps = (state: any) => ({
-    books: state.basket.books
-});
-
-export default connect(
-    mapStateToProps,
-    null
-)(BasketComponent);
 
 const BasketWrapper = styled.div`
     
@@ -105,6 +74,22 @@ const BookList = styled.div`
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    
+    @media(max-width: 992px){
+        &:after{
+            content: "";
+            width: calc(100% / 2 - 1rem);
+            min-height: 350px;
+        }
+    }    
+    
+    @media(max-width: 526px){
+        &:after{
+            content: "";
+            width: calc(100% - 0.5rem);
+            min-height: 350px;
+        }
+    }
     
     &:after{
         content: "";
@@ -119,26 +104,11 @@ const BookList = styled.div`
     }
 `;
 
-export const Delete = styled.div`
-    width: 0;
-    height: 0;
-    position: absolute;
-    right: -20px;
-    bottom: -20px;
-    border-radius: 50%;
-    transition: .6s cubic-bezier(0.785, 0.135, 0.15, 0.86);
-    display: flex;
-    background: transparent;
-    box-shadow: 0 0 24px #8b8b8b;
-    cursor: pointer;
-`;
-
-export const IconDelete = styled.img`
-    width: 30%;
-    height: auto;
-    position: absolute;
-    top: 14px;
-    left: 18px;
+export const Image = styled.img`
+    width: 100%;
+    border-radius: 4px;
+    transition: .2s linear;
+    z-index: -1;
 `;
 
 export const ItemImage = styled.div`
@@ -161,16 +131,13 @@ export const ItemImage = styled.div`
         bottom: -50px;
     }
     
+    &:hover ${Image} {
+        transform: translateY(-16px);
+    }
+    
     &:hover {
         background: transparent;
     }
-`;
-
-export const Image = styled.img`
-    width: 100%;
-    border-radius: 4px;
-    transition: .2s linear;
-    z-index: -1;
 `;
 
 export const BookItem = styled.div`
@@ -184,8 +151,8 @@ export const BookItem = styled.div`
         width: calc(100% / 2 - 1rem);
     }
     
-    &:hover ${Image} {
-        transform: translateY(-16px);
+    @media(max-width: 526px){
+        width: calc(100% - 0.5rem);
     }
 `;
 
