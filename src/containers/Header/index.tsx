@@ -7,8 +7,6 @@ type Props = {
 };
 
 export const Header = (props: Props) => {
-    console.log(props);
-
     return (
         <HeaderWrapper>
             <Nav>
